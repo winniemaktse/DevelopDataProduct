@@ -1,0 +1,58 @@
+Body Fat Prediction App
+========================================================
+author: Winnie M.
+date: 2020/12/16
+autosize: true
+
+Introduction
+========================================================
+
+The purpose of the App is to predict bodyfat ratio with one's weight and height using the 'bodyfat' data set.
+
+How it works
+========================================================
+
+1. Create the data input and output User Interface (UI) in ui.R
+    - Read weight and height from the input side panel
+    - Display the calculations and plot in the main output panel
+    
+2. Create the data computing function in server.R
+    - Read the bodyfat data set
+    - Compute body-mass index (BMI) in the data set using formula (i.e. weight / height ^ 2)
+    - Fit a linear model with BMI as input and bodyfat as output to find the coefficients
+    - Use the inputs and coefficients to calculate the prediction
+
+Bodyfat Data Set
+========================================================
+
+```{r}
+# Read the dataset and remove outlier
+bodyfat <- read.csv("http://staff.pubhealth.ku.dk/~tag/Teaching/share/data/Bodyfat.csv")
+bodyfat <- bodyfat[,-1]; bodyfat <- bodyfat[-42,]
+
+## Change the unit of inputs and compute BMI
+bodyfat$BMI <- bodyfat$Weight*0.4536 / (bodyfat$Height*0.0254)^2
+
+dim(bodyfat)
+
+head(bodyfat[,c(3:4,15)])
+
+```
+
+Slide With Plot
+========================================================
+
+```{r}
+# Fit the linear model
+fit.lm <- lm(bodyfat~BMI, data=bodyfat)
+fit.lm$coef
+```
+
+```{r, echo=FALSE}
+with(bodyfat, plot(y = bodyfat, x = BMI))
+lines(x = c(0, 50),
+      y = c(fit.lm$coefficients[1], fit.lm$coefficients[2]*50+fit.lm$coefficients[1]),
+      col = "red",
+      lwd=5)
+
+```
